@@ -19,12 +19,17 @@ namespace ShoppingListDemo.Controllers
         }
 
         // GET: ShoppingItems
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? shoppingCategoryId)
         {
-            var shoppingItems = await _context.ShoppingItems
-                .Include(s => s.ShoppingCategory)
-                .ToListAsync();
-            
+            IQueryable<ShoppingItem> shoppingItemsQuery = _context.ShoppingItems
+                .Include(s => s.ShoppingCategory);
+
+            if (shoppingCategoryId.HasValue)
+            {
+                shoppingItemsQuery = shoppingItemsQuery.Where(x => x.ShoppingCategoryId == shoppingCategoryId.Value);
+            }
+
+            var shoppingItems = await shoppingItemsQuery.ToListAsync();
             return View(shoppingItems);
         }
 
@@ -49,10 +54,10 @@ namespace ShoppingListDemo.Controllers
         }
 
         // GET: ShoppingItems/Create
-        public IActionResult Create()
+        public IActionResult Create(int? shoppingCategoryId)
         {
             ViewData["ShoppingCategoryId"] = new SelectList(_context.ShoppingCategories, 
-                "Id", "Name");
+                "Id", "Name", shoppingCategoryId);
             return View();
         }
 

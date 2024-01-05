@@ -1,13 +1,12 @@
 ﻿@model ShoppingListDemo.Data.ShoppingItem
 
 @{
-    ViewData["Title"] = "Edit";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Редакция на продукт";
 }
 
-<h1>Edit</h1>
+<h1>@ViewData["Title"]</h1>
 
-<h4>ShoppingItem</h4>
+<h4>Продукт</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -25,14 +24,11 @@
                 <span asp-validation-for="ShoppingCategoryId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="Запис" class="btn btn-primary" /> |
+                <a asp-action="Index">Назад към списък</a>
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {

@@ -1,18 +1,8 @@
-html {
-  font-size: 14px;
+.form-group {
+    padding-top: 15px;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-html {
-  position: relative;
-  min-height: 100%;
-}
-
-body {
-  margin-bottom: 60px;
+div.container {
+    margin-top: 25px;
+    margin-bottom: 15px;
 }

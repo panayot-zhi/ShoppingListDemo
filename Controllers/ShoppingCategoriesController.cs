@@ -16,7 +16,9 @@ namespace ShoppingListDemo.Controllers
         // GET: ShoppingCategories
         public async Task<IActionResult> Index()
         {
-            var shoppingCategories = await _context.ShoppingCategories.ToListAsync();
+            var shoppingCategories = await _context.ShoppingCategories
+                .OrderBy(x => x.Order)
+                .ToListAsync();
             return View(shoppingCategories);
         }
 
@@ -29,6 +31,7 @@ namespace ShoppingListDemo.Controllers
             }
 
             var shoppingCategory = await _context.ShoppingCategories
+                .Include(x => x.ShoppingItems)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (shoppingCategory == null)
@@ -125,6 +128,7 @@ namespace ShoppingListDemo.Controllers
             }
 
             var shoppingCategory = await _context.ShoppingCategories
+                .Include(x => x.ShoppingItems)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (shoppingCategory == null)

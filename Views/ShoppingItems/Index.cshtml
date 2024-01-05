@@ -1,42 +1,42 @@
 ﻿@model IEnumerable<ShoppingListDemo.Data.ShoppingItem>
 
 @{
-    ViewData["Title"] = "Index";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Списък с продукти";
 }
 
-<h1>Index</h1>
+<h1>@ViewData["Title"]</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create">Създаване на продукт</a>
 </p>
+
 <table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ShoppingCategory)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ShoppingCategory.Name)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var ((categoryId, categoryName), products) in Model
+            .OrderBy(x => x.ShoppingCategory!.Order)
+            .GroupBy(x => new Tuple<int, string>(x.ShoppingCategory!.Id, x.ShoppingCategory!.Name))
+            .ToDictionary(
+                x => x.Key, 
+                x => x.ToList()
+            )
+        )
+        {
+            <tr class="table-active">
+                <td>Категория '@categoryName'</td>
+                <td class="text-end"><a asp-action="Create" asp-route-shoppingCategoryId="@categoryId">Създай продукт към категорията</a></td>
+            </tr>
+
+            foreach (var product in products)
+            {
+                <tr>
+                    <td class="ps-4">- @product.Name</td>
+                    <td class="text-end">
+                        <a asp-action="Edit" asp-route-id="@product.Id">Редакция</a> |
+                        <a asp-action="Details" asp-route-id="@product.Id">Преглед</a> |
+                        <a asp-action="Delete" asp-route-id="@product.Id">Изтриване</a>
+                    </td>
+                </tr>
+            }
+        }
     </tbody>
 </table>

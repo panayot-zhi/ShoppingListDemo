@@ -1,14 +1,13 @@
 ﻿@model ShoppingListDemo.Data.ShoppingCategory
 
 @{
-    ViewData["Title"] = "Details";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Преглед на категория";
 }
 
-<h1>Details</h1>
+<h1>@ViewData["Title"]</h1>
 
-<div>
-    <h4>ShoppingCategory</h4>
+<div class="pt-4">
+    <h4>Категория</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
@@ -26,8 +25,36 @@
             @Html.DisplayFor(model => model.Name)
         </dd>
     </dl>
+    <hr/>
+    <h4>Включени продукти</h4>
+    <p class ="text-end">
+        <a asp-controller="ShoppingItems" asp-action="Create" asp-route-shoppingCategoryId="@Model.Id">Създай продукт към категорията</a>
+    </p>
+    <table class="table">
+        <tbody>
+        @if (Model.ShoppingItems.Any())
+        {
+            foreach (var item in Model.ShoppingItems)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td>
+                    За категорията няма записани продукти.
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Редакция</a> |
+    <a asp-action="Index">Назад към Списък</a>
 </div>
