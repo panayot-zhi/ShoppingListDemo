@@ -13,4 +13,12 @@
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EditorConfigFiles Remove="F:\projects\.netCore\ShoppingListDemo\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="F:\projects\.netCore\ShoppingListDemo\.editorconfig" />
+  </ItemGroup>
+
 </Project>
