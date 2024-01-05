@@ -22,78 +22,96 @@ namespace ShoppingListDemo.Migrations
             modelBuilder.Entity("ShoppingItemShoppingSchedule", b =>
                 {
                     b.Property<int>("ShoppingItemsId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("shopping_items_id");
 
                     b.Property<int>("ShoppingSchedulesId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("shopping_schedules_id");
 
-                    b.HasKey("ShoppingItemsId", "ShoppingSchedulesId");
+                    b.HasKey("ShoppingItemsId", "ShoppingSchedulesId")
+                        .HasName("pk_shopping_item_shopping_schedule");
 
-                    b.HasIndex("ShoppingSchedulesId");
+                    b.HasIndex("ShoppingSchedulesId")
+                        .HasDatabaseName("ix_shopping_item_shopping_schedule_shopping_schedules_id");
 
-                    b.ToTable("ShoppingItemShoppingSchedule");
+                    b.ToTable("shopping_item_shopping_schedule", (string)null);
                 });
 
             modelBuilder.Entity("ShoppingListDemo.Data.ShoppingCategory", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("id");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("name");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_shopping_categories");
 
-                    b.ToTable("ShoppingCategories");
+                    b.ToTable("shopping_categories", (string)null);
                 });
 
             modelBuilder.Entity("ShoppingListDemo.Data.ShoppingItem", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("id");
 
                     b.Property<string>("Currency")
                         .IsRequired()
                         .HasMaxLength(65)
-                        .HasColumnType("varchar(65)");
+                        .HasColumnType("varchar(65)")
+                        .HasColumnName("currency");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("name");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(8,2)");
+                        .HasColumnType("decimal(8,2)")
+                        .HasColumnName("price");
 
                     b.Property<int>("ShoppingCategoryId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("shopping_category_id");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_shopping_items");
 
-                    b.HasIndex("ShoppingCategoryId");
+                    b.HasIndex("ShoppingCategoryId")
+                        .HasDatabaseName("ix_shopping_items_shopping_category_id");
 
-                    b.ToTable("ShoppingItems");
+                    b.ToTable("shopping_items", (string)null);
                 });
 
             modelBuilder.Entity("ShoppingListDemo.Data.ShoppingSchedule", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("id");
 
                     b.Property<DateTime>("Day")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("day");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_shopping_schedules");
 
                     b.HasIndex("Day")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("ix_shopping_schedules_day");
 
-                    b.ToTable("ShoppingSchedules");
+                    b.ToTable("shopping_schedules", (string)null);
                 });
 
             modelBuilder.Entity("ShoppingItemShoppingSchedule", b =>
@@ -102,13 +120,15 @@ namespace ShoppingListDemo.Migrations
                         .WithMany()
                         .HasForeignKey("ShoppingItemsId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_shopping_item_shopping_schedule_shopping_items_shopping_item");
 
                     b.HasOne("ShoppingListDemo.Data.ShoppingSchedule", null)
                         .WithMany()
                         .HasForeignKey("ShoppingSchedulesId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_shopping_item_shopping_schedule_shopping_schedules_shopping_");
                 });
 
             modelBuilder.Entity("ShoppingListDemo.Data.ShoppingItem", b =>
@@ -117,7 +137,8 @@ namespace ShoppingListDemo.Migrations
                         .WithMany("ShoppingItems")
                         .HasForeignKey("ShoppingCategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_shopping_items_shopping_categories_shopping_category_id");
 
                     b.Navigation("ShoppingCategory");
                 });
