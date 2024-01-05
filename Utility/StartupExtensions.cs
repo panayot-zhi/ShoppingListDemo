@@ -9,8 +9,8 @@ public static class StartupExtensions
 {
     public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("DefaultConnection") ??
-                throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+        var connectionString = configuration.GetConnectionString("SqliteConnection") ??
+                throw new InvalidOperationException("Connection string 'SqliteConnection' not found.");
 
         services.AddDbContext<ApplicationDbContext>(
             contextLifetime: ServiceLifetime.Scoped,
@@ -19,7 +19,8 @@ public static class StartupExtensions
                     .EnableDetailedErrors()
                     .UseSnakeCaseNamingConvention()
                     .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
-                    .UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+                    .UseSqlite(connectionString));
+                    //.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
         return services;
     }

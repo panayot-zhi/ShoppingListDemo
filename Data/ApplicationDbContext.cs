@@ -4,11 +4,11 @@ namespace ShoppingListDemo.Data;
 
 public class ApplicationDbContext : DbContext
 {
-    public DbSet<ShoppingSchedule>? ShoppingSchedules { get; set; }
+    public DbSet<ScheduledShoppingItem> ScheduledShoppingItems { get; set; }
 
-    public DbSet<ShoppingCategory>? ShoppingCategories { get; set; }
+    public DbSet<ShoppingCategory> ShoppingCategories { get; set; }
 
-    public DbSet<ShoppingItem>? ShoppingItems { get; set; }
+    public DbSet<ShoppingItem> ShoppingItems { get; set; }
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
@@ -17,7 +17,13 @@ public class ApplicationDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<ShoppingSchedule>(entity =>
+        modelBuilder.Entity<ShoppingCategory>(entity =>
+        {
+            entity.HasIndex(e => e.Name).IsUnique();
+            entity.HasIndex(e => e.Order).IsUnique();
+        });
+
+        modelBuilder.Entity<ScheduledShoppingItem>(entity =>
         {
             entity.HasIndex(e => e.Day).IsUnique();
         });

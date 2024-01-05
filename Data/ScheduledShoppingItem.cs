@@ -2,7 +2,7 @@
 
 namespace ShoppingListDemo.Data;
 
-public class ShoppingSchedule
+public class ScheduledShoppingItem
 {
     [Required]
     public int Id { get; set; }
@@ -10,5 +10,9 @@ public class ShoppingSchedule
     [Required]
     public DateTime Day { get; set; }
 
-    public ICollection<ShoppingItem> ShoppingItems { get; set; }
+    [Required]
+    public bool Bought { get; set; }
+
+    [Required]
+    public ShoppingItem ShoppingItem { get; set; }
 }

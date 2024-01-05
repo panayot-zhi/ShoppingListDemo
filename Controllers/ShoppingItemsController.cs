@@ -21,19 +21,17 @@ namespace ShoppingListDemo.Controllers
         // GET: ShoppingItems
         public async Task<IActionResult> Index()
         {
-            if (_context.ShoppingItems != null)
-            {
-                var applicationDbContext = _context.ShoppingItems.Include(s => s.ShoppingCategory);
-                return View(await applicationDbContext.ToListAsync());
-            }
-
-            return Problem("Entity set 'ApplicationDbContext.ShoppingItems'  is null.");
+            var shoppingItems = await _context.ShoppingItems
+                .Include(s => s.ShoppingCategory)
+                .ToListAsync();
+            
+            return View(shoppingItems);
         }
 
         // GET: ShoppingItems/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.ShoppingItems == null)
+            if (id == null)
             {
                 return NotFound();
             }
@@ -41,6 +39,7 @@ namespace ShoppingListDemo.Controllers
             var shoppingItem = await _context.ShoppingItems
                 .Include(s => s.ShoppingCategory)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (shoppingItem == null)
             {
                 return NotFound();
@@ -52,7 +51,8 @@ namespace ShoppingListDemo.Controllers
         // GET: ShoppingItems/Create
         public IActionResult Create()
         {
-            ViewData["ShoppingCategoryId"] = new SelectList(_context.ShoppingCategories, "Id", "Name");
+            ViewData["ShoppingCategoryId"] = new SelectList(_context.ShoppingCategories, 
+                "Id", "Name");
             return View();
         }
 
@@ -61,22 +61,24 @@ namespace ShoppingListDemo.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Price,Currency,ShoppingCategoryId")] ShoppingItem shoppingItem)
+        public async Task<IActionResult> Create([Bind("Id,Name,ShoppingCategoryId")] ShoppingItem shoppingItem)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                _context.Add(shoppingItem);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                ViewData["ShoppingCategoryId"] = new SelectList(_context.ShoppingCategories,
+                    "Id", "Name", shoppingItem.ShoppingCategoryId);
+                return View(shoppingItem);
             }
-            ViewData["ShoppingCategoryId"] = new SelectList(_context.ShoppingCategories, "Id", "Name", shoppingItem.ShoppingCategoryId);
-            return View(shoppingItem);
+
+            _context.Add(shoppingItem);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: ShoppingItems/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.ShoppingItems == null)
+            if (id == null)
             {
                 return NotFound();
             }
@@ -86,7 +88,9 @@ namespace ShoppingListDemo.Controllers
             {
                 return NotFound();
             }
-            ViewData["ShoppingCategoryId"] = new SelectList(_context.ShoppingCategories, "Id", "Name", shoppingItem.ShoppingCategoryId);
+
+            ViewData["ShoppingCategoryId"] = new SelectList(_context.ShoppingCategories, 
+                "Id", "Name", shoppingItem.ShoppingCategoryId);
             return View(shoppingItem);
         }
 
@@ -95,41 +99,42 @@ namespace ShoppingListDemo.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Price,Currency,ShoppingCategoryId")] ShoppingItem shoppingItem)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,ShoppingCategoryId")] ShoppingItem shoppingItem)
         {
             if (id != shoppingItem.Id)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(shoppingItem);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ShoppingItemExists(shoppingItem.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                ViewData["ShoppingCategoryId"] = new SelectList(_context.ShoppingCategories, 
+                    "Id", "Name", shoppingItem.ShoppingCategoryId);
+                return View(shoppingItem);
             }
-            ViewData["ShoppingCategoryId"] = new SelectList(_context.ShoppingCategories, "Id", "Name", shoppingItem.ShoppingCategoryId);
-            return View(shoppingItem);
+
+            try
+            {
+                _context.Update(shoppingItem);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ShoppingItemExists(shoppingItem.Id))
+                {
+                    return NotFound();
+                }
+
+                throw;
+            }
+
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: ShoppingItems/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.ShoppingItems == null)
+            if (id == null)
             {
                 return NotFound();
             }
@@ -137,6 +142,7 @@ namespace ShoppingListDemo.Controllers
             var shoppingItem = await _context.ShoppingItems
                 .Include(s => s.ShoppingCategory)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (shoppingItem == null)
             {
                 return NotFound();
@@ -150,10 +156,6 @@ namespace ShoppingListDemo.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.ShoppingItems == null)
-            {
-                return Problem("Entity set 'ApplicationDbContext.ShoppingItems'  is null.");
-            }
             var shoppingItem = await _context.ShoppingItems.FindAsync(id);
             if (shoppingItem != null)
             {
@@ -166,7 +168,7 @@ namespace ShoppingListDemo.Controllers
 
         private bool ShoppingItemExists(int id)
         {
-          return (_context.ShoppingItems?.Any(e => e.Id == id)).GetValueOrDefault();
+            return _context.ShoppingItems.Any(e => e.Id == id);
         }
     }
 }

@@ -12,19 +12,11 @@ public class ShoppingItem
     [MaxLength(255)]
     public string Name { get; set; }
 
-    [Required]
-    [Column(TypeName = "decimal(8, 2)")]
-    public decimal Price { get; set; }
-
-    [Required]
-    [MaxLength(65)]
-    public string Currency { get; set; }
-
     [ForeignKey("ShoppingCategory")]
     public int ShoppingCategoryId { get; set; }
 
-    public ShoppingCategory ShoppingCategory { get; set; }
+    public ShoppingCategory? ShoppingCategory { get; set; }
 
-    public ICollection<ShoppingSchedule> ShoppingSchedules { get; set; }
+    public ICollection<ScheduledShoppingItem>? ShoppingSchedules { get; set; }
 
 }

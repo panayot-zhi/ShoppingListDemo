@@ -13,8 +13,7 @@ namespace ShoppingListDemo
             var environment = builder.Environment;
             var host = builder.Host;
 
-            host.UseSerilog((_, loggerConfiguration) =>
-                loggerConfiguration.ReadFrom.Configuration(configuration));
+            host.UseSerilog(ConfigureLogger);
 
             services.AddDatabase(configuration);
             services.AddControllersWithViews();
@@ -22,10 +21,7 @@ namespace ShoppingListDemo
 
             var app = builder.Build();
 
-            if (!environment.IsDevelopment())
-            {
-                app.UseExceptionHandler("/Home/Error");
-            }
+            app.UseExceptionHandler("/Home/Error");
 
             app.UseStaticFiles();
             app.UseRouting();
@@ -38,6 +34,15 @@ namespace ShoppingListDemo
             );
 
             app.Run();
+        }
+
+        private static void ConfigureLogger(HostBuilderContext context, IServiceProvider services, LoggerConfiguration configuration)
+        {
+            configuration
+                .ReadFrom.Configuration(context.Configuration)
+                .ReadFrom.Services(services)
+                .Enrich.FromLogContext()
+                .WriteTo.Console();
         }
     }
 }
