@@ -4,11 +4,11 @@ namespace ShoppingListDemo.Data;
 
 public class ApplicationDbContext : DbContext
 {
-    public DbSet<ShoppingSchedule> ShoppingSchedules { get; set; }
+    public DbSet<ShoppingSchedule>? ShoppingSchedules { get; set; }
 
-    public DbSet<ShoppingCategory> ShoppingCategories { get; set; }
+    public DbSet<ShoppingCategory>? ShoppingCategories { get; set; }
 
-    public DbSet<ShoppingItem> ShoppingItems { get; set; }
+    public DbSet<ShoppingItem>? ShoppingItems { get; set; }
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)

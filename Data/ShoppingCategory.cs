@@ -11,5 +11,5 @@ public class ShoppingCategory
     [MaxLength(255)]
     public string Name { get; set; }
 
-    public ICollection<ShoppingItem> ShoppingItems { get; set; }
+    public ICollection<ShoppingItem>? ShoppingItems { get; set; }
 }
