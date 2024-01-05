@@ -1,3 +1,6 @@
+using ShoppingListDemo.Utility;
+using Serilog;
+
 namespace ShoppingListDemo
 {
     public class Program
@@ -5,26 +8,34 @@ namespace ShoppingListDemo
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            var configuration = builder.Configuration;
+            var services = builder.Services;
+            var environment = builder.Environment;
+            var host = builder.Host;
 
-            // Add services to the container.
-            builder.Services.AddControllersWithViews();
+            host.UseSerilog((_, loggerConfiguration) =>
+                loggerConfiguration.ReadFrom.Configuration(configuration));
+
+            services.AddDatabase(configuration);
+            services.AddControllersWithViews();
+            services.AddRoutes();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
-            if (!app.Environment.IsDevelopment())
+            if (!environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
             }
-            app.UseStaticFiles();
 
+            app.UseStaticFiles();
             app.UseRouting();
 
             app.UseAuthorization();
 
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+                pattern: "{controller=Home}/{action=Index}/{id?}"
+            );
 
             app.Run();
         }
