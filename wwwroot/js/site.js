@@ -9,6 +9,29 @@
 //    document.querySelector('section.calendar-container').classList.toggle('light');
 //};
 
+window.currentDate = window.currentDate || new Date();
+window.targetDate = window.targetDate || new Date();
+
+const padZero = (value) => (value < 10 ? `0${value}` : `${value}`);
+
+function formatDate(inputDate, format) {
+    if (!inputDate) return '';
+
+    const padZero = (value) => (value < 10 ? `0${value}` : `${value}`);
+    const parts = {
+        yyyy: inputDate.getFullYear(),
+        MM: padZero(inputDate.getMonth() + 1),
+        dd: padZero(inputDate.getDate()),
+        HH: padZero(inputDate.getHours()),
+        hh: padZero(inputDate.getHours() > 12 ? inputDate.getHours() - 12 : inputDate.getHours()),
+        mm: padZero(inputDate.getMinutes()),
+        ss: padZero(inputDate.getSeconds()),
+        tt: inputDate.getHours() < 12 ? 'AM' : 'PM'
+    };
+
+    return format.replace(/yyyy|MM|dd|HH|hh|mm|ss|tt/g, (match) => parts[match]);
+}
+
 // Check Year
 isCheckYear = (year) => {
     return (year % 4 === 0 && year % 100 !== 0 && year % 400 !== 0)
@@ -28,7 +51,11 @@ monthPicker.onclick = () => {
 };
 
 // Generate Calendar
-generateCalendar = (month, year) => {
+generateCalendar = (date) => {
+
+    let month = date.getMonth();
+    let year = date.getFullYear();
+
     let calendarDay = document.querySelector('.calendar-day');
     calendarDay.innerHTML = '';
 
@@ -43,17 +70,27 @@ generateCalendar = (month, year) => {
 
     for (let i = 0; i <= daysOfMonth[month] + firstDay.getDay() - 1; i++) {
         let day = document.createElement('div')
+        
         if (i >= firstDay.getDay()) {
-            day.classList.add('calendarDayHover')
-            day.innerHTML = i - firstDay.getDay() + 1
+
+            day.innerHTML =  i - firstDay.getDay() + 1
             day.innerHTML += `<span></span>
                              <span></span>
                              <span></span>
                              <span></span>`
+
             if (i - firstDay.getDay() + 1 === todaysDate.getDate() && year === todaysDate.getFullYear() && month === todaysDate.getMonth()) {
-                day.classList.add('currDate')
+                day.classList.add('todaysDate')
+            }
+
+            if (i - firstDay.getDay() + 1 === targetDate.getDate() && year === targetDate.getFullYear() && month === targetDate.getMonth()) {
+                day.classList.add('targetDate')
+                //day.classList.add('importantDate')
+            } else {
+                day.classList.add('calendarDayHover')
             }
         }
+
         calendarDay.appendChild(day)
     };
 };
@@ -64,24 +101,18 @@ monthNames.forEach((e, index) => {
     month.innerHTML = `<div>${e}</div>`
     month.onclick = () => {
         monthList.classList.remove('show')
-        currMonth.value = index
-        generateCalendar(currMonth.value, currYear.value)
+        currentDate.setMonth(index)        
+        generateCalendar(currentDate)
     }
     monthList.appendChild(month)
 });
 
-document.querySelector('#prev-year').onclick = () => {
-    --currYear.value
-    generateCalendar(currMonth.value, currYear.value)
+document.querySelector('#prev-year').onclick = () => {    
+    currentDate.setFullYear(currentDate.getFullYear() - 1)
+    generateCalendar(currentDate)
 };
 
 document.querySelector('#next-year').onclick = () => {
-    ++currYear.value
-    generateCalendar(currMonth.value, currYear.value)
+    currentDate.setFullYear(currentDate.getFullYear() + 1)
+    generateCalendar(currentDate)
 };
-
-let currDate = new Date()
-let currMonth = { value: currDate.getMonth() };
-let currYear = { value: currDate.getFullYear() };
-
-generateCalendar(currMonth.value, currYear.value);

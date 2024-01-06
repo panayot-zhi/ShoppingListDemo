@@ -1,65 +1,167 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model ShoppingListViewModel
+
+@{
+    ViewData["Title"] = "Списък за пазаруване";
 }
 
-<section class="light">
-    <div class="calendar">
-        <!-- CALENDAR HEADER START -->
-        <div class="calendar-header">
-            <span class="month-picker" id="month-picker">
-                
-            </span>
-            <div class="year-picker">
-                <span class="year-change mt-3" id="prev-year">
-                    <pre> < </pre>
-                </span>
-                <span id="year">@DateTime.Now.Year</span>
-                <span class="year-change mt-3" id="next-year">
-                    <pre> > </pre>
-                </span>
-            </div>
+<div class="row">
+    <div class="col-12 col-md-6">
+        
+        <h4 class="pt-4 text-center">@DateTime.Now.ToString("D")</h4>
+
+        <section class="pt-2 pb-4 light align-content-center align-items-center text-center">
+            <div class="calendar">
+                <!-- CALENDAR HEADER START -->
+                <div class="calendar-header">
+                    <span class="month-picker" id="month-picker">
+
+                    </span>
+                    <div class="year-picker">
+                        <span class="year-change mt-3" id="prev-year">
+                            <pre> < </pre>
+                        </span>
+                        <span id="year">@Model.CurrentDate.Year</span>
+                        <span class="year-change mt-3" id="next-year">
+                            <pre> > </pre>
+                        </span>
+                    </div>
 
 
-        </div>
-
-        <!-- CALENDAR BODY START -->
-        <div class="calendar-body">
-            <div class="calendar-week-day">
-                <div>Пон</div>
-                <div>Втo</div>
-                <div>Сря</div>
-                <div>Чет</div>
-                <div>Пет</div>
-                <div>Съб</div>
-                <div>Нед</div>
-            </div>
-            <div class="calendar-day">
-                <div>
-                    1
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                    <span></span>
                 </div>
-                <div>2</div>
-                <div>3</div>
-                <div>4</div>
-                <div>5</div>
-                <div>6</div>
-                <div>7</div>
+
+                <!-- CALENDAR BODY START -->
+                <div class="calendar-body">
+                    <div class="calendar-week-day">
+                        <div>Пон</div>
+                        <div>Втo</div>
+                        <div>Сря</div>
+                        <div>Чет</div>
+                        <div>Пет</div>
+                        <div>Съб</div>
+                        <div>Нед</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div>
+                            1
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <div>2</div>
+                        <div>3</div>
+                        <div>4</div>
+                        <div>5</div>
+                        <div>6</div>
+                        <div>7</div>
+                    </div>
+                </div>
+
+                <!-- CALENDAR FOOTER START -->
+                @* <div class="calendar-footer"> *@
+                @*     <div class="toggle"> *@
+                @*         <span>Dark Mode</span> *@
+                @*         <div class="dark-mode-switch"> *@
+                @*             <div class="dark-mode-switch-ident"></div> *@
+                @*         </div> *@
+                @*     </div> *@
+                @* </div> *@
+
+                <div class="month-list"></div>
             </div>
-        </div>
+        </section>
+        
+        <p>
+            <h4 class="pt-4">Продукти за деня</h4>
+            <small class="pb-4">@Model.CurrentDate.ToString("dd MMM yyyy, dddd, HH:mm:ss")</small>
+        </p>
 
-        <!-- CALENDAR FOOTER START -->
-        @* <div class="calendar-footer"> *@
-        @*     <div class="toggle"> *@
-        @*         <span>Dark Mode</span> *@
-        @*         <div class="dark-mode-switch"> *@
-        @*             <div class="dark-mode-switch-ident"></div> *@
-        @*         </div> *@
-        @*     </div> *@
-        @* </div> *@
+        @if (!Model.CurrentShoppingItems.Any())
+        {
+            <p class="text-center">Няма продукти за днес.</p>
+        }
+        else
+        {
+            <table class="table">
+                <tbody>
+                    @foreach (var (categoryName, items) in Model.CurrentShoppingItems
+                        .OrderBy(x => x.ShoppingItem.ShoppingCategory!.Order)
+                        .GroupBy(x => x.ShoppingItem.ShoppingCategory!.Name)
+                        .ToDictionary(
+                            x => x.Key,
+                            x => x.ToList()
+                        )
+                    )
+                    {
+                        <tr class="table-active align-content-center">
+                            <td>Категория '@categoryName'</td>
+                        </tr>
 
-        <div class="month-list"></div>
+                        foreach (var item in items)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" id="shopping-item-@item.Id" @(item.Bought ? "checked" : "")>
+                                        <label class="form-check-label" for="shopping-item-@item.Id">
+                                            @item.ShoppingItem.Name
+                                        </label>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        }
+
+
     </div>
-</section>
+
+    <div class="col-12 col-md-6">
+        <h2>Списък с продукти</h2>
+        <h4 class="pb-4">Изберете продукт за да го добавите в списъка с продукти за текущия ден</h4>
+        <table class="table">
+            <tbody>
+            @foreach (var ((categoryId, categoryName), products) in Model.AllShoppingItems
+                .OrderBy(x => x.ShoppingCategory!.Order)
+                .GroupBy(x => new Tuple<int, string>(x.ShoppingCategory!.Id, x.ShoppingCategory!.Name))
+                .ToDictionary(
+                    x => x.Key,
+                    x => x.ToList()
+                )
+            )
+            {
+                <tr class="table-active align-content-center">
+                    <td>Категория '@categoryName'</td>
+                </tr>
+
+                foreach (var product in products)
+                {
+                    <tr>
+                        <td><button type="button" class="btn btn-secondary"> &lt; </button> <span class="ps-4">@product.Name</span></td>
+                    </tr>
+                }
+            }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        window.currentDate = new Date("@Model.CurrentDate.ToString("yyyy-MM-dd")")
+        window.targetDate = new Date("@Model.CurrentDate.ToString("yyyy-MM-dd")")
+        window.generateCalendar(window.currentDate);
+
+        $(document).on('click', 'div.calendarDayHover', function(e) {
+            var month = monthNames.indexOf($("#month-picker").text());  
+            var day = $(e.target).text().trim()
+            var year = $("#year").text();
+            
+            var date = new Date(year, month, day)
+                        
+            window.location.href = "/?at=" + formatDate(date, "yyyy-MM-dd")
+        })
+    </script>
+}

@@ -63,7 +63,11 @@
     overflow: hidden;
 }
 
-.light .calendar { box-shadow: var(--shadow); }
+.light .calendar {
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: var(--shadow);
+}
 
 .calendar-header {
     display: flex;
@@ -115,7 +119,9 @@
     cursor: pointer;
 }
 
-.month-picker:hover { background-color: var(--color-hover); }
+.month-picker:hover {
+    background-color: var(--color-hover);
+}
 
 .year-picker {
     display: flex;
@@ -131,7 +137,9 @@
     cursor: pointer;
 }
 
-.year-change pre:hover { background-color: var(--color-hover); }
+.year-change pre:hover {
+     background-color: var(--color-hover);
+}
 
 .calendar-footer {
     padding: 10px;
@@ -140,7 +148,9 @@
     align-items: center;
 }
 
-.toggle { display: flex; }
+.toggle {
+     display: flex;
+}
 
 .toggle span {
     margin-right: 10px;
@@ -164,7 +174,7 @@
     position: absolute;
     top: 2px;
     left: 2px;
-    transition: left 0.2 ease-in-out;
+    transition: left 0.2s ease-in-out;
 }
 
 .dark .dark-mode-switch .dark-mode-switch-ident {
@@ -174,7 +184,9 @@
 
 .calendar-day div span { position: absolute; }
 
-.calendar-day div:hover span { transition: width 0.2s ease-in-out, height 0.2s ease-in-out; }
+.calendar-day div.calendarDayHover:hover span {
+     transition: width 0.1s ease-in-out, height 0.1s ease-in-out;
+}
 
 .calendar-day div span:nth-child(1),
 .calendar-day div span:nth-child(3) {
@@ -183,8 +195,10 @@
     background-color: var(--color-txt);
 }
 
-.calendar-day div:hover span:nth-child(1),
-.calendar-day div:hover span:nth-child(3) { height: 100%; }
+.calendar-day div.calendarDayHover:hover span:nth-child(1),
+.calendar-day div.calendarDayHover:hover span:nth-child(3) {
+    height: 100%;
+}
 
 .calendar-day div span:nth-child(1) {
     bottom: 0;
@@ -203,8 +217,10 @@
     background-color: var(--color-txt);
 }
 
-.calendar-day div:hover span:nth-child(2),
-.calendar-day div:hover span:nth-child(4) { width: 100%; }
+.calendar-day div.calendarDayHover:hover span:nth-child(2),
+.calendar-day div.calendarDayHover:hover span:nth-child(4) {
+    width: 100%;
+}
 
 .calendar-day div span:nth-child(2) {
     top: 0;
@@ -216,19 +232,36 @@
     right: 0;
 }
 
-.calendar-day div:hover span:nth-child(2) { transition-delay: 0.2s; }
+.calendar-day div.calendarDayHover:hover span:nth-child(2) {
+    transition-delay: 0.1s;
+}
 
-.calendar-day div:hover span:nth-child(3) { transition-delay: 0.4s; }
+.calendar-day div.calendarDayHover:hover span:nth-child(3) {
+    transition-delay: 0.2s;
+}
 
-.calendar-day div:hover span:nth-child(4) { transition-delay: 0.6s; }
+.calendar-day div.calendarDayHover:hover span:nth-child(4) {
+    transition-delay: 0.3s;
+}
 
-.calendar-day div.currDate {
+.calendar-day div.importantDate {
+    background-color: var(--bg-second);
+    color: var(--white);
+    border-radius: 50%;
+}
+.calendar-day div.targetDate {
+    border: 2px solid black;
+}
+    
+.calendar-day div.todaysDate {
     background-color: var(--green);
     color: var(--white);
     border-radius: 50%;
 }
 
-.calendar-day div.currDate span { display: none; }
+/* .calendar-day div.todaysDate span { */
+/*      display: none; */
+/* } */
 
 .month-list {
     position: absolute;

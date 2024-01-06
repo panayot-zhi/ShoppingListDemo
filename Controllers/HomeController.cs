@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using ShoppingListDemo.Data;
 using ShoppingListDemo.Models;
 using System.Diagnostics;
 using System.Security.Cryptography;
@@ -9,17 +11,39 @@ namespace ShoppingListDemo.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private IWebHostEnvironment _environment;
+        private readonly ApplicationDbContext _context;
 
-        public HomeController(ILogger<HomeController> logger, IWebHostEnvironment environment)
+        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context)
         {
             _logger = logger;
-            _environment = environment;
+            _context = context;
         }
 
-        public IActionResult Index()
+        // GET: ScheduledShoppingItems
+        public async Task<IActionResult> Index([FromQuery] DateTime? at)
         {
-            return View();
+            IQueryable<ScheduledShoppingItem> scheduledShoppingItemsQuery = _context.ScheduledShoppingItems;
+            IQueryable<ShoppingItem> shoppingItemsQuery = _context.ShoppingItems
+                .Include(s => s.ShoppingCategory);
+
+            if (at.HasValue)
+            {
+                scheduledShoppingItemsQuery = scheduledShoppingItemsQuery
+                    .Include(x => x.ShoppingItem)
+                        .ThenInclude(x => x.ShoppingCategory)
+                    .Where(x => x.Day == at.Value.Date);
+            }
+
+            var scheduledShoppingItems = await scheduledShoppingItemsQuery.ToListAsync();
+            var shoppingItems = await shoppingItemsQuery.ToListAsync();
+            var viewModel = new ShoppingListViewModel()
+            {
+                CurrentDate = at ?? DateTime.Now,
+                CurrentShoppingItems = scheduledShoppingItems,
+                AllShoppingItems = shoppingItems
+            };
+
+            return View(viewModel);
         }
 
         public IActionResult Privacy()
