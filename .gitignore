@@ -1,5 +1,9 @@
-appsettings.Development.json
-appsettings.Production.json
 .vs/
 bin/
 obj/
+appsettings.Development.json
+appsettings.Production.json
+./ShoppingList.db
+./ShoppingList.db-shm
+./ShoppingList.db
+
