@@ -1,6 +1,6 @@
 You would need to be able to run the commands: `dotnet, git`
 
-`git clone https://github.com/panayot-zhi/ShoppingListDemo.git .`
+`git clone https://github.com/panayot-zhi/ShoppingListDemo.git .`  
 `dotnet run`
 
 Built with: 
