@@ -2,161 +2,160 @@
 using Microsoft.EntityFrameworkCore;
 using ShoppingListDemo.Data;
 
-namespace ShoppingListDemo.Controllers
+namespace ShoppingListDemo.Controllers;
+
+public class ShoppingCategoriesController : Controller
 {
-    public class ShoppingCategoriesController : Controller
+    private readonly ApplicationDbContext _context;
+
+    public ShoppingCategoriesController(ApplicationDbContext context)
     {
-        private readonly ApplicationDbContext _context;
+        _context = context;
+    }
 
-        public ShoppingCategoriesController(ApplicationDbContext context)
+    // GET: ShoppingCategories
+    public async Task<IActionResult> Index()
+    {
+        var shoppingCategories = await _context.ShoppingCategories
+            .OrderBy(x => x.Order)
+            .ToListAsync();
+        return View(shoppingCategories);
+    }
+
+    // GET: ShoppingCategories/Details/5
+    public async Task<IActionResult> Details(int? id)
+    {
+        if (id == null)
         {
-            _context = context;
+            return NotFound();
         }
 
-        // GET: ShoppingCategories
-        public async Task<IActionResult> Index()
+        var shoppingCategory = await _context.ShoppingCategories
+            .Include(x => x.ShoppingItems)
+            .FirstOrDefaultAsync(m => m.Id == id);
+
+        if (shoppingCategory == null)
         {
-            var shoppingCategories = await _context.ShoppingCategories
-                .OrderBy(x => x.Order)
-                .ToListAsync();
-            return View(shoppingCategories);
+            return NotFound();
         }
 
-        // GET: ShoppingCategories/Details/5
-        public async Task<IActionResult> Details(int? id)
+        return View(shoppingCategory);
+    }
+
+    // GET: ShoppingCategories/Create
+    public IActionResult Create()
+    {
+        return View();
+    }
+
+    // POST: ShoppingCategories/Create
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create([Bind("Id,Name")] ShoppingCategory shoppingCategory)
+    {
+        if (!ModelState.IsValid)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var shoppingCategory = await _context.ShoppingCategories
-                .Include(x => x.ShoppingItems)
-                .FirstOrDefaultAsync(m => m.Id == id);
-
-            if (shoppingCategory == null)
-            {
-                return NotFound();
-            }
-
             return View(shoppingCategory);
         }
 
-        // GET: ShoppingCategories/Create
-        public IActionResult Create()
+        shoppingCategory.Order = _context.ShoppingCategories.Count() + 1;
+        _context.Add(shoppingCategory);
+        await _context.SaveChangesAsync();
+        return RedirectToAction(nameof(Index));
+
+    }
+
+    // GET: ShoppingCategories/Edit/5
+    public async Task<IActionResult> Edit(int? id)
+    {
+        if (id == null)
         {
-            return View();
+            return NotFound();
         }
 
-        // POST: ShoppingCategories/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name")] ShoppingCategory shoppingCategory)
+        var shoppingCategory = await _context.ShoppingCategories.FindAsync(id);
+        if (shoppingCategory == null)
         {
-            if (!ModelState.IsValid)
-            {
-                return View(shoppingCategory);
-            }
+            return NotFound();
+        }
 
-            shoppingCategory.Order = _context.ShoppingCategories.Count() + 1;
-            _context.Add(shoppingCategory);
+        return View(shoppingCategory);
+    }
+
+    // POST: ShoppingCategories/Edit/5
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Order")] ShoppingCategory shoppingCategory)
+    {
+        if (id != shoppingCategory.Id)
+        {
+            return NotFound();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return View(shoppingCategory);
+        }
+
+        try
+        {
+            _context.Update(shoppingCategory);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!ShoppingCategoryExists(shoppingCategory.Id))
+            {
+                return NotFound();
+            }
 
+            throw;
         }
 
-        // GET: ShoppingCategories/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        return RedirectToAction(nameof(Index));
+    }
+
+    // GET: ShoppingCategories/Delete/5
+    public async Task<IActionResult> Delete(int? id)
+    {
+        if (id == null)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var shoppingCategory = await _context.ShoppingCategories.FindAsync(id);
-            if (shoppingCategory == null)
-            {
-                return NotFound();
-            }
-
-            return View(shoppingCategory);
+            return NotFound();
         }
 
-        // POST: ShoppingCategories/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Order")] ShoppingCategory shoppingCategory)
+        var shoppingCategory = await _context.ShoppingCategories
+            .Include(x => x.ShoppingItems)
+            .FirstOrDefaultAsync(m => m.Id == id);
+
+        if (shoppingCategory == null)
         {
-            if (id != shoppingCategory.Id)
-            {
-                return NotFound();
-            }
-
-            if (!ModelState.IsValid)
-            {
-                return View(shoppingCategory);
-            }
-
-            try
-            {
-                _context.Update(shoppingCategory);
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ShoppingCategoryExists(shoppingCategory.Id))
-                {
-                    return NotFound();
-                }
-
-                throw;
-            }
-
-            return RedirectToAction(nameof(Index));
+            return NotFound();
         }
 
-        // GET: ShoppingCategories/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        return View(shoppingCategory);
+    }
+
+    // POST: ShoppingCategories/Delete/5
+    [HttpPost, ActionName("Delete")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteConfirmed(int id)
+    {
+        var shoppingCategory = await _context.ShoppingCategories.FindAsync(id);
+        if (shoppingCategory != null)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var shoppingCategory = await _context.ShoppingCategories
-                .Include(x => x.ShoppingItems)
-                .FirstOrDefaultAsync(m => m.Id == id);
-
-            if (shoppingCategory == null)
-            {
-                return NotFound();
-            }
-
-            return View(shoppingCategory);
+            _context.ShoppingCategories.Remove(shoppingCategory);
         }
-
-        // POST: ShoppingCategories/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var shoppingCategory = await _context.ShoppingCategories.FindAsync(id);
-            if (shoppingCategory != null)
-            {
-                _context.ShoppingCategories.Remove(shoppingCategory);
-            }
             
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
+        await _context.SaveChangesAsync();
+        return RedirectToAction(nameof(Index));
+    }
 
-        private bool ShoppingCategoryExists(int id)
-        {
-            return _context.ShoppingCategories.Any(e => e.Id == id);
-        }
+    private bool ShoppingCategoryExists(int id)
+    {
+        return _context.ShoppingCategories.Any(e => e.Id == id);
     }
 }
