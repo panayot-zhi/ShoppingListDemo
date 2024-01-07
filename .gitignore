@@ -3,7 +3,6 @@ bin/
 obj/
 appsettings.Development.json
 appsettings.Production.json
-./ShoppingList.db
-./ShoppingList.db-shm
-./ShoppingList.db
-
+/ShoppingListDemo.db
+/ShoppingListDemo.db-shm
+/ShoppingListDemo.db
