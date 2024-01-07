@@ -1,7 +1,10 @@
 You would need to be able to run the commands: `dotnet, git`
 
-`git clone https://github.com/panayot-zhi/ShoppingListDemo.git .`  
-`dotnet run`
+```
+git clone https://github.com/panayot-zhi/ShoppingListDemo.git .
+dotnet run
+open n browser http://localhost:5144
+```
 
 Built with: 
 
