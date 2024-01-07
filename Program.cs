@@ -1,5 +1,7 @@
+using Microsoft.EntityFrameworkCore;
 using ShoppingListDemo.Utility;
 using Serilog;
+using ShoppingListDemo.Data;
 
 namespace ShoppingListDemo;
 
@@ -20,6 +22,10 @@ public class Program
         services.AddRoutes();
 
         var app = builder.Build();
+
+        using var serviceScope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
+        using var context = serviceScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            context.Database.Migrate();
 
         app.UseExceptionHandler("/Home/Error");
 
