@@ -25,7 +25,9 @@ public class ApplicationDbContext : DbContext
 
         modelBuilder.Entity<ScheduledShoppingItem>(entity =>
         {
-            entity.HasIndex(e => e.Day).IsUnique();
+            entity.HasIndex(x => x.Day);
+            entity.HasIndex(nameof(ScheduledShoppingItem.Day), nameof(ScheduledShoppingItem.ShoppingItemId))
+                .IsUnique();
         });
     }
 }
