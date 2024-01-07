@@ -1,9 +1,10 @@
-You would need to be able to run the commands: `dotnet, git`
+You would need to be able to run the commands: `dotnet, git`  
+You would need .NET6 (SDK) to run the app: https://dotnet.microsoft.com/en-us/download/dotnet/6.0
 
 ```
 git clone https://github.com/panayot-zhi/ShoppingListDemo.git .
 dotnet run
-open n browser http://localhost:5144
+open in browser http://localhost:5144
 ```
 
 Built with: 
