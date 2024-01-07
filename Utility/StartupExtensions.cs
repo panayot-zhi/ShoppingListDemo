@@ -18,17 +18,13 @@ public static class StartupExtensions
                     .UseSnakeCaseNamingConvention()
                     .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
                     .UseSqlite(connectionString));
-                    //.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
         return services;
     }
 
     public static IServiceCollection AddRoutes(this IServiceCollection services)
     {
-        services.AddRouting(option =>
-        {
-            option.LowercaseUrls = true;
-        });
+        services.AddRouting();
 
         return services;
     }

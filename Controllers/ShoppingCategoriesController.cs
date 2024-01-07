@@ -60,7 +60,15 @@ public class ShoppingCategoriesController : Controller
             return View(shoppingCategory);
         }
 
-        shoppingCategory.Order = _context.ShoppingCategories.Count() + 1;
+        var order = 10;
+        if (_context.ShoppingCategories.Any())
+        {
+            order = _context.ShoppingCategories
+                .Max(x => x.Order) + 10;
+        }
+
+        shoppingCategory.Order = order;
+
         _context.Add(shoppingCategory);
         await _context.SaveChangesAsync();
         return RedirectToAction(nameof(Index));

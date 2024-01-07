@@ -5,4 +5,4 @@ appsettings.Development.json
 appsettings.Production.json
 /ShoppingListDemo.db
 /ShoppingListDemo.db-shm
-/ShoppingListDemo.db
+/ShoppingListDemo.db-wal
