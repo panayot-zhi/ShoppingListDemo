@@ -11,8 +11,8 @@ using ShoppingListDemo.Data;
 namespace ShoppingListDemo.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240105133650_InitialDatabase")]
-    partial class InitialDatabase
+    [Migration("20240107094814_GenerateDatabase")]
+    partial class GenerateDatabase
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -42,11 +42,14 @@ namespace ShoppingListDemo.Migrations
                         .HasName("pk_scheduled_shopping_items");
 
                     b.HasIndex("Day")
-                        .IsUnique()
                         .HasDatabaseName("ix_scheduled_shopping_items_day");
 
                     b.HasIndex("ShoppingItemId")
                         .HasDatabaseName("ix_scheduled_shopping_items_shopping_item_id");
+
+                    b.HasIndex("Day", "ShoppingItemId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_scheduled_shopping_items_day_shopping_item_id");
 
                     b.ToTable("scheduled_shopping_items", (string)null);
                 });
@@ -111,7 +114,7 @@ namespace ShoppingListDemo.Migrations
             modelBuilder.Entity("ShoppingListDemo.Data.ScheduledShoppingItem", b =>
                 {
                     b.HasOne("ShoppingListDemo.Data.ShoppingItem", "ShoppingItem")
-                        .WithMany("ShoppingSchedules")
+                        .WithMany()
                         .HasForeignKey("ShoppingItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
@@ -135,11 +138,6 @@ namespace ShoppingListDemo.Migrations
             modelBuilder.Entity("ShoppingListDemo.Data.ShoppingCategory", b =>
                 {
                     b.Navigation("ShoppingItems");
-                });
-
-            modelBuilder.Entity("ShoppingListDemo.Data.ShoppingItem", b =>
-                {
-                    b.Navigation("ShoppingSchedules");
                 });
 #pragma warning restore 612, 618
         }
