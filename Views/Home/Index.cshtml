@@ -5,9 +5,9 @@
 }
 
 <div class="row">
-    <div class="col-12 col-md-6">
+    <div class="col-12 col-lg-6">
         
-        <h4 class="pt-4 text-center">@DateTime.Now.ToString("D")</h4>
+        <h4 class="pt-4 text-center"><a href="@Url.Action("Index")">@DateTime.Now.ToString("D")</a></h4>
 
         <section class="pt-2 pb-4 light align-content-center align-items-center text-center">
             <div class="calendar">
@@ -25,8 +25,6 @@
                             <pre> > </pre>
                         </span>
                     </div>
-
-
                 </div>
 
                 <!-- CALENDAR BODY START -->
@@ -73,7 +71,7 @@
         
         <p>
             <h4 class="pt-4">Продукти за деня</h4>
-            <small class="pb-4">@Model.CurrentDate.ToString("dd MMM yyyy, dddd, HH:mm:ss")</small>
+            <small class="pb-4">@Model.CurrentDate.ToString("dd MMM yyyy, dddd")</small>
         </p>
 
         @if (!Model.CurrentShoppingItems.Any())
@@ -85,8 +83,8 @@
             <table class="table">
                 <tbody>
                     @foreach (var (categoryName, items) in Model.CurrentShoppingItems
-                        .OrderBy(x => x.ShoppingItem.ShoppingCategory!.Order)
-                        .GroupBy(x => x.ShoppingItem.ShoppingCategory!.Name)
+                        .OrderBy(x => x.ShoppingItem!.ShoppingCategory!.Order)
+                        .GroupBy(x => x.ShoppingItem!.ShoppingCategory!.Name)
                         .ToDictionary(
                             x => x.Key,
                             x => x.ToList()
@@ -102,9 +100,9 @@
                             <tr>
                                 <td>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="" id="shopping-item-@item.Id" @(item.Bought ? "checked" : "")>
-                                        <label class="form-check-label" for="shopping-item-@item.Id">
-                                            @item.ShoppingItem.Name
+                                        <input class="form-check-input bought-marker" type="checkbox" id="scheduled-shopping-item-@item.Id" value="scheduled-shopping-item-@item.Id" @(item.Bought ? "checked" : "")>
+                                        <label class="form-check-label" for="scheduled-shopping-item-@item.Id">
+                                            @item.ShoppingItem!.Name
                                         </label>
                                     </div>
                                 </td>
@@ -118,7 +116,7 @@
 
     </div>
 
-    <div class="col-12 col-md-6">
+    <div class="col-12 col-lg-6">
         <h2>Списък с продукти</h2>
         <h4 class="pb-4">Изберете продукт за да го добавите в списъка с продукти за текущия ден</h4>
         <table class="table">
@@ -139,7 +137,21 @@
                 foreach (var product in products)
                 {
                     <tr>
-                        <td><button type="button" class="btn btn-secondary"> &lt; </button> <span class="ps-4">@product.Name</span></td>
+                        <td>
+                            @{
+                                var existingShoppingItem = Model.CurrentShoppingItems.FirstOrDefault(x => x.ShoppingItemId == product.Id);
+                            }
+                            
+                            @if (existingShoppingItem is not null)
+                            {
+                                <button type="button" class="btn btn-danger scheduled-shopping-item-remove" value="scheduled-shopping-item-@existingShoppingItem.Id"> X </button>
+                            }
+                            else
+                            {
+                                <button type="button" class="btn btn-success shopping-item-picker" value="shopping-item-@product.Id"> &lt; </button>
+                            }
+                            <span class="ps-4">@product.Name</span>
+                        </td>
                     </tr>
                 }
             }
@@ -150,18 +162,74 @@
 
 @section Scripts {
     <script>
-        window.currentDate = new Date("@Model.CurrentDate.ToString("yyyy-MM-dd")")
-        window.targetDate = new Date("@Model.CurrentDate.ToString("yyyy-MM-dd")")
+            
+        window.importantDates = JSON.parse('@Json.Serialize(Model.ScheduledShoppingItemsCountPerDay)')
+        window.currentDate = new Date('@Model.CurrentDate.ToString("yyyy-MM-dd")')
+        window.targetDate = new Date('@Model.CurrentDate.ToString("yyyy-MM-dd")')
         window.generateCalendar(window.currentDate);
 
-        $(document).on('click', 'div.calendarDayHover', function(e) {
-            var month = monthNames.indexOf($("#month-picker").text());  
-            var day = $(e.target).text().trim()
-            var year = $("#year").text();
-            
-            var date = new Date(year, month, day)
-                        
+        $(document).on('click', 'div.calendarDayHover', function (e) {            
+            let month = monthNames.indexOf($("#month-picker").text());
+            let day = e.target.innerText.split('\n').at(0);
+            let year = $("#year").text();
+
+            let date = new Date(year, month, day);
+
             window.location.href = "/?at=" + formatDate(date, "yyyy-MM-dd")
-        })
+        });
+
+        $(document).on('click', 'input.bought-marker', function (e) {
+            let scheduledShoppingItemId = $(e.target).val().replace('scheduled-shopping-item-', '');
+
+            $.ajax({
+                type: 'POST',
+                url: '/toggleBought/' + scheduledShoppingItemId,
+                success: function (response) {
+                    // no-op
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error:', error);
+                }
+            });
+        });
+
+        $(document).on('click', 'button.shopping-item-picker', function (e) {
+            let shoppingItemId = $(e.target).val().replace('shopping-item-', '');
+            let date = formatDate(window.targetDate, "yyyy-MM-dd");
+
+            let request = {
+                day: date,
+                shoppingItemId: shoppingItemId
+            };
+
+            $.ajax({
+                type: 'POST',
+                url: '/addItem',                
+                contentType: 'application/json',
+                data: JSON.stringify(request),
+                success: function (response) {
+                    window.location.reload(true);
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error:', error);
+                }
+            });
+        });
+
+        $(document).on('click', 'button.scheduled-shopping-item-remove', function (e) {
+            let scheduledShoppingItemId = $(e.target).val().replace('scheduled-shopping-item-', '');
+
+            $.ajax({
+                type: 'POST',
+                url: '/removeItem/' + scheduledShoppingItemId,
+                success: function (response) {
+                    window.location.reload(true);
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error:', error);
+                }
+            });
+        });
+    
     </script>
 }

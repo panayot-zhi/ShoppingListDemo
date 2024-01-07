@@ -16,7 +16,7 @@
     --light-second: #C3C2C8;
     --light-hover: #EDF0F5;
     --light-text: #151426;
-    --green: #03C988;
+    --green: #18bc9c;
     --white: #fff;
     --shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
     --font-family: cursive;
@@ -257,6 +257,18 @@
     background-color: var(--green);
     color: var(--white);
     border-radius: 50%;
+}
+
+.calendar-day div.importantDate span.shopping-list-count {
+    position: absolute;
+    font-size: 0.65em;
+    display: block;
+    height: 15px;
+    width: 15px;
+    background: #f39c12;
+    border-radius: 50%;
+    left: 0;
+    top: 0;
 }
 
 /* .calendar-day div.todaysDate span { */

@@ -11,8 +11,7 @@
 
 window.currentDate = window.currentDate || new Date();
 window.targetDate = window.targetDate || new Date();
-
-const padZero = (value) => (value < 10 ? `0${value}` : `${value}`);
+window.importantDates = window.importantDates || {};
 
 function formatDate(inputDate, format) {
     if (!inputDate) return '';
@@ -32,14 +31,13 @@ function formatDate(inputDate, format) {
     return format.replace(/yyyy|MM|dd|HH|hh|mm|ss|tt/g, (match) => parts[match]);
 }
 
-// Check Year
-isCheckYear = (year) => {
+checkLeapYear = (year) => {
     return (year % 4 === 0 && year % 100 !== 0 && year % 400 !== 0)
         || (year % 100 === 0 && year % 400 === 0)
 };
 
-getFebDays = (year) => {
-    return isCheckYear(year) ? 29 : 28
+getFebruaryDays = (year) => {
+    return checkLeapYear(year) ? 29 : 28
 };
 
 let calendar = document.querySelector('.calendar');
@@ -50,7 +48,6 @@ monthPicker.onclick = () => {
     monthList.classList.add('show')
 };
 
-// Generate Calendar
 generateCalendar = (date) => {
 
     let month = date.getMonth();
@@ -60,38 +57,47 @@ generateCalendar = (date) => {
     calendarDay.innerHTML = '';
 
     let calendarHeaderYear = document.querySelector('#year');
-    let daysOfMonth = [31, getFebDays(year), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    let daysOfMonth = [31, getFebruaryDays(year), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
     let todaysDate = new Date();
 
     monthPicker.innerHTML = monthNames[month];
     calendarHeaderYear.innerHTML = year;
 
-    let firstDay = new Date(year, month, 0);
+    let firstDay = new Date(year, month, 1);
+    
+    for (let i = 1; i <= daysOfMonth[month] + firstDay.getDay() - 1; i++) {
 
-    for (let i = 0; i <= daysOfMonth[month] + firstDay.getDay() - 1; i++) {
-        let day = document.createElement('div')
-        
+        let day = i - firstDay.getDay() + 1;
+        let dayElement = document.createElement('div');
+        let current = new Date(year, month, day);
+
         if (i >= firstDay.getDay()) {
 
-            day.innerHTML =  i - firstDay.getDay() + 1
-            day.innerHTML += `<span></span>
+            dayElement.innerHTML = day
+            dayElement.innerHTML += `<span></span>
                              <span></span>
                              <span></span>
                              <span></span>`
 
-            if (i - firstDay.getDay() + 1 === todaysDate.getDate() && year === todaysDate.getFullYear() && month === todaysDate.getMonth()) {
-                day.classList.add('todaysDate')
+            if (day === todaysDate.getDate() && year === todaysDate.getFullYear() && month === todaysDate.getMonth()) {
+                dayElement.classList.add('todaysDate')
             }
 
-            if (i - firstDay.getDay() + 1 === targetDate.getDate() && year === targetDate.getFullYear() && month === targetDate.getMonth()) {
-                day.classList.add('targetDate')
-                //day.classList.add('importantDate')
+            if (day === targetDate.getDate() && year === targetDate.getFullYear() && month === targetDate.getMonth()) {
+                dayElement.classList.add('targetDate')
             } else {
-                day.classList.add('calendarDayHover')
-            }
+                dayElement.classList.add('calendarDayHover')
+            }            
+            
+            var shoppingListCount = window.importantDates[`${formatDate(current, "yyyy-MM-dd")}`]
+            if (shoppingListCount) {
+                dayElement.classList.add('importantDate')
+                dayElement.innerHTML += `<span class="shopping-list-count">${shoppingListCount}</span>`
+            }     
+                    
         }
 
-        calendarDay.appendChild(day)
+        calendarDay.appendChild(dayElement)
     };
 };
 

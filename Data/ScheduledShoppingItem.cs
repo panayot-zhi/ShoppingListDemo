@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ShoppingListDemo.Data;
 
@@ -18,5 +19,9 @@ public class ScheduledShoppingItem
 
     [Required]
     [Display(Name = "Продукт")]
-    public ShoppingItem ShoppingItem { get; set; }
+    [ForeignKey("ShoppingItem")]
+    public int ShoppingItemId { get; set; }
+
+    [Display(Name = "Продукт")]
+    public ShoppingItem? ShoppingItem { get; set; }
 }

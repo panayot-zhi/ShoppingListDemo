@@ -14,6 +14,7 @@ public class ShoppingItem
     [Display(Name = "Име")]
     public string Name { get; set; }
 
+    [Required]
     [Display(Name = "Категория")]
     [ForeignKey("ShoppingCategory")]
     public int ShoppingCategoryId { get; set; }

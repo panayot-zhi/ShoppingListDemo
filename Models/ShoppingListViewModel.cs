@@ -9,4 +9,6 @@ public class ShoppingListViewModel
     public List<ShoppingItem> AllShoppingItems { get; set; } = new();
 
     public List<ScheduledShoppingItem> CurrentShoppingItems { get; set; } = new();
+
+    public Dictionary<string, int> ScheduledShoppingItemsCountPerDay { get; set; } = new();
 }
